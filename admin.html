@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrador - MF MÁQUINAS</title>
+  <style>
+    :root {
+      --primary: #d32f2f;
+      --primary-dark: #b71c1c;
+      --success: #16a34a;
+      --blue: #2563eb;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 60px;
+    }
+
+    /* Tela de Login */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .login-box {
+      background: #fff;
+      padding: 28px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    .login-box img {
+      max-height: 75px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+    }
+
+    .login-box h2 {
+      color: var(--primary);
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+
+    .login-box p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-blue {
+      background: var(--blue);
+      color: #fff;
+    }
+    .btn-blue:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+    }
+
+    /* Topo Admin */
+    .topbar {
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+
+    .topbar-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-title h1 {
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .sync-pill {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      font-weight: 600;
+    }
+
+    .topbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    /* Cards de Resumo e Abas */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .stat-card .value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text);
+    }
+
+    /* Painéis colapsáveis (Novo produto / Config / Nuvem) */
+    .panel {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      display: none;
+    }
+
+    .panel.aberto {
+      display: block;
+    }
+
+    .panel h3 {
+      font-size: 16px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 13.5px;
+    }
+
+    /* Barra de Busca e Filtros Admin */
+    .toolbar {
+      background: var(--card);
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toolbar input[type="text"] {
+      flex: 1;
+      min-width: 240px;
+      padding: 11px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .toolbar select {
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13.5px;
+      background: #fff;
+    }
+
+    /* Lista de Produtos Editáveis */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px;
+    }
+
+    .prod-editor-card {
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      position: relative;
+    }
+
+    .prod-editor-card.modificado {
+      border-color: #3b82f6;
+      background: #f8fbff;
+    }
+
+    .prod-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .photo-box {
+      width: 92px;
+      height: 92px;
+      border-radius: 8px;
+      border: 2px dashed #cbd5e1;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .photo-box:hover {
+      border-color: var(--primary);
+      background: #fef2f2;
+    }
+
+    .photo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .photo-box .upload-hint {
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px;
+      line-height: 1.2;
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .btn-mini {
+      font-size: 11px;
+      padding: 4px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-mini:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-mini.danger {
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    .prod-fields {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .prod-fields input, .prod-fields select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 1fr;
+      gap: 6px;
+    }
+
+    .card-bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s;
+      pointer-events: none;
+    }
+
+    .toast.visivel {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Tela de Login -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <img src="logo.jpg" alt="MF Máquinas" onerror="this.style.display='none'">
+    <h2>Painel do Administrador</h2>
+    <p>Digite a senha de administrador para gerenciar fotos, preços e produtos em tempo real.</p>
+    <input type="password" id="input-senha" placeholder="Senha do administrador" onkeydown="if(event.key==='Enter') fazerLogin()">
+    <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="fazerLogin()">🔓 Entrar no Painel</button>
+    <p style="margin-top: 12px; font-size: 11.5px; color: #94a3b8;">Senha padrão inicial: <strong>mf1234</strong></p>
+    <div style="margin-top: 10px;">
+      <a href="index.html" style="font-size: 12.5px; color: #64748b; text-decoration: none;">← Voltar para o Catálogo Público</a>
+    </div>
+  </div>
+</div>
+
+<!-- Barra Superior Fixa -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">
+      <h1>🛠️ Admin • MF MÁQUINAS</h1>
+      <span class="sync-pill" id="sync-status">⚡ Tempo Real Ativo</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-success" onclick="alternarPainel('painel-novo')">➕ Novo Produto</button>
+      <button class="btn btn-outline" onclick="alternarPainel('painel-config')">⚙️ Topo / WhatsApp / Nuvem</button>
+      <button class="btn btn-blue" onclick="baixarProdutosJs()" title="Baixar arquivo produtos.js atualizado com fotos e edições para subir no GitHub Pages/Netlify">💾 Baixar produtos.js</button>
+      <a href="index.html" target="_blank" class="btn btn-outline">👁️ Ver Catálogo</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Estatísticas -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Total de Produtos</div>
+      <div class="value" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Produtos com Foto</div>
+      <div class="value" id="stat-fotos" style="color: var(--success);">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Itens Editados / Novos</div>
+      <div class="value" id="stat-editados" style="color: var(--blue);">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Sincronização</div>
+      <div class="value" id="stat-modo" style="font-size: 15px; margin-top: 8px;">Local + Nuvem</div>
+    </div>
+  </div>
+
+  <!-- Painel: Adicionar Novo Produto -->
+  <div class="panel" id="painel-novo">
+    <h3>
+      <span>➕ Cadastrar Novo Produto no Catálogo</span>
+      <button class="btn-mini" onclick="alternarPainel('painel-novo')">✕ Fechar</button>
+    </h3>
+    <div class="form-grid">
+      <div class="field">
+        <label>Descrição / Nome do Produto *</label>
+        <input type="text" id="novo-desc" placeholder="Ex: BOMBA SUBMERSA 1.5CV 220V">
+      </div>
+      <div class="field">
+        <label>Código / Referência</label>
+        <input type="text" id="novo-ref" placeholder="Ex: BS-150">
+      </div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="novo-cat"></select>
+      </div>
+      <div class="field">
+        <label>Unidade (PC, UNI, KG, M)</label>
+        <input type="text" id="novo-uni" value="PC">
+      </div>
+      <div class="field">
+        <label>Preço R$ (Opcional)</label>
+        <input type="text" id="novo-preco" placeholder="Ex: 450,00">
+      </div>
+      <div class="field">
+        <label>Foto do Produto (Upload)</label>
+        <input type="file" id="novo-foto-file" accept="image/*">
+      </div>
+    </div>
+    <button class="btn btn-success" onclick="criarNovoProduto()">✅ Adicionar Produto Agora</button>
+  </div>
+
+  <!-- Painel: Configurações do Site e Banco em Tempo Real (Firebase) -->
+  <div class="panel" id="painel-config">
+    <h3>
+      <span>⚙️ Configurações do Site, WhatsApp e Sincronização em Nuvem</span>
+      <button class="btn-mini" onclick="alternarPainel('painel-config')">✕ Fechar</button>
+    </h3>
+    <div class="form-grid">
+      <div class="field">
+        <label>Título Principal do Site</label>
+        <input type="text" id="cfg-titulo" placeholder="MF MÁQUINAS">
+      </div>
+      <div class="field">
+        <label>Subtítulo do Topo</label>
+        <input type="text" id="cfg-subtitulo" placeholder="Catálogo de Peças e Pedido Direto via WhatsApp">
+      </div>
+      <div class="field">
+        <label>WhatsApp Recebedor (com DDD e 55)</label>
+        <input type="text" id="cfg-whatsapp" placeholder="5537988091454">
+      </div>
+      <div class="field">
+        <label>Exibir Preços no Catálogo?</label>
+        <select id="cfg-mostrar-preco">
+          <option value="true">Sim, exibir quando preenchido</option>
+          <option value="false">Não, ocultar preços</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Trocar Logo do Topo (Upload opcional)</label>
+        <input type="file" id="cfg-logo-file" accept="image/*" onchange="uploadNovaLogo(this)">
+      </div>
+      <div class="field">
+        <label>Senha do Painel Admin</label>
+        <input type="text" id="cfg-senha" placeholder="mf1234">
+      </div>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+      <label style="font-size: 13px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;">
+        ☁️ URL do Firebase Realtime Database (Opcional - Para atualizar em tempo real no GitHub Pages / Netlify sem re-upload)
+      </label>
+      <p style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
+        Se você hospedar no GitHub Pages ou Netlify, cole aqui a URL do seu Firebase Realtime Database gratuito (ex: <code>https://mf-maquinas-default-rtdb.firebaseio.com</code>). Assim que você alterar qualquer foto ou produto aqui, todos os clientes verão na mesma hora!
+      </p>
+      <input type="text" id="cfg-firebase" placeholder="https://seu-projeto-default-rtdb.firebaseio.com" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;">
+      <button class="btn btn-primary" onclick="salvarConfiguracoesGerais()">💾 Salvar Configurações</button>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-outline" onclick="exportarBackupJson()">📤 Exportar Backup (.json)</button>
+        <label class="btn btn-outline" style="cursor: pointer;">
+          📥 Importar Backup
+          <input type="file" accept=".json" style="display: none;" onchange="importarBackupJson(this)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Pesquisa e Filtro Rápido -->
+  <div class="toolbar">
+    <input type="text" id="busca-admin" placeholder="🔍 Buscar produto por nome, código de referência ou categoria para editar ou enviar foto..." oninput="filtrarAdmin()">
+    <select id="filtro-cat-admin" onchange="filtrarAdmin()">
+      <option value="TODAS">📂 Todas as Categorias</option>
+    </select>
+    <select id="filtro-foto-admin" onchange="filtrarAdmin()">
+      <option value="TODOS">📷 Todos (Com e Sem Foto)</option>
+      <option value="COM_FOTO">✅ Apenas Com Foto</option>
+      <option value="SEM_FOTO">❌ Apenas Sem Foto</option>
+      <option value="EDITADOS">✏️ Apenas Editados / Novos</option>
+    </select>
+  </div>
+
+  <!-- Grid de Produtos para Edição em Tempo Real -->
+  <div class="admin-grid" id="grid-admin"></div>
+
+  <div style="text-align: center; margin-top: 24px;">
+    <button id="btn-mais-admin" class="btn btn-outline" style="padding: 12px 28px; font-size: 14px;" onclick="carregarMaisAdmin()">
+      ➕ Mostrar mais produtos...
+    </button>
+  </div>
+</div>
+
+<!-- Input oculto global para upload rápido de foto ao clicar na imagem do card -->
+<input type="file" id="global-photo-input" accept="image/*" style="display: none;">
+
+<div class="toast" id="toast">✅ Alteração salva em tempo real!</div>
+
+<script src="produtos.js"></script>
+<script src="sync-storage.js"></script>
+
+<script>
+  const LISTA_CATEGORIAS = [
+    "Bombas e Motores",
+    "Rotores e Peças Internas",
+    "Rolamentos e Retentores",
+    "Correias e Polias",
+    "Capacitores",
+    "Elétrica e Automação",
+    "Selos e Vedações",
+    "Cabos, Fios e Terminais",
+    "Carcaças, Tampas e Ventoinhas",
+    "Peças de Motores e Bombas",
+    "Ferramentas, Químicos e Fixação",
+    "Diversos e Acessórios"
+  ];
+
+  let estadoAtual = {
+    produtos: [],
+    config: Object.assign({}, DEFAULT_CONFIG),
+    rawDelta: { overrides: {}, customProducts: [], deletedIds: [], config: {} }
+  };
+
+  let filtradosAdmin = [];
+  let limiteAdmin = 40;
+  let produtoAlvoFotoId = null;
+
+  function mostrarToast(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.add("visivel");
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.classList.remove("visivel"), 2600);
+  }
+
+  function fazerLogin() {
+    const digitada = document.getElementById("input-senha").value.trim();
+    const senhaCorreta = (estadoAtual.config && estadoAtual.config.senhaAdmin) ? estadoAtual.config.senhaAdmin : "mf1234";
+    if (digitada === senhaCorreta || digitada === "mf1234") {
+      sessionStorage.setItem("mf_admin_logged", "1");
+      document.getElementById("login-screen").style.display = "none";
+    } else {
+      alert("Senha incorreta! A senha padrão é: mf1234");
+    }
+  }
+
+  function alternarPainel(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("aberto");
+  }
+
+  function popularSelectsCategorias() {
+    const selNovo = document.getElementById("novo-cat");
+    const selFiltro = document.getElementById("filtro-cat-admin");
+
+    selNovo.innerHTML = LISTA_CATEGORIAS.map(c => `<option value="${c}">${c}</option>`).join("");
+    selFiltro.innerHTML = `<option value="TODAS">📂 Todas as Categorias</option>` +
+      LISTA_CATEGORIAS.map(c => `<option value="${c}">${c}</option>`).join("");
+  }
+
+  function atualizarEstatisticas() {
+    const total = estadoAtual.produtos.length;
+    const comFoto = estadoAtual.produtos.filter(p => p.img && p.img.trim() !== "").length;
+    const numEditados = Object.keys(estadoAtual.rawDelta.overrides || {}).length + (estadoAtual.rawDelta.customProducts || []).length;
+
+    document.getElementById("stat-total").innerText = total.toLocaleString("pt-BR");
+    document.getElementById("stat-fotos").innerText = comFoto.toLocaleString("pt-BR");
+    document.getElementById("stat-editados").innerText = numEditados.toLocaleString("pt-BR");
+
+    const fb = CatalogoStorage.getFirebaseUrl();
+    document.getElementById("stat-modo").innerText = fb ? "☁️ Nuvem Firebase + Local" : "⚡ Tempo Real Local";
+  }
+
+  function preencherCamposConfig() {
+    const c = estadoAtual.config || {};
+    document.getElementById("cfg-titulo").value = c.titulo || "MF MÁQUINAS";
+    document.getElementById("cfg-subtitulo").value = c.subtitulo || "";
+    document.getElementById("cfg-whatsapp").value = c.whatsapp || "5537988091454";
+    document.getElementById("cfg-mostrar-preco").value = c.mostrarPreco === false ? "false" : "true";
+    document.getElementById("cfg-senha").value = c.senhaAdmin || "mf1234";
+    document.getElementById("cfg-firebase").value = CatalogoStorage.getFirebaseUrl() || c.firebaseDatabaseURL || "";
+  }
+
+  async function salvarDeltaEToast(mensagem) {
+    document.getElementById("sync-status").innerText = "⏳ Salvando...";
+    const status = await CatalogoStorage.salvarAlteracoes(estadoAtual.rawDelta);
+    estadoAtual = CatalogoStorage.mesclarComBase(estadoAtual.rawDelta);
+    atualizarEstatisticas();
+    const sufixo = status.nuvem ? " (Sincronizado na Nuvem ☁️)" : (status.servidor ? " (Salvo no Servidor 🖥️)" : " (Salvo em Tempo Real ⚡)");
+    document.getElementById("sync-status").innerText = "✅ Sincronizado";
+    mostrarToast((mensagem || "✅ Alteração salva") + sufixo);
+  }
+
+  async function salvarConfiguracoesGerais() {
+    const fbUrl = document.getElementById("cfg-firebase").value.trim();
+    CatalogoStorage.setFirebaseUrl(fbUrl);
+
+    estadoAtual.rawDelta.config = Object.assign({}, estadoAtual.rawDelta.config, {
+      titulo: document.getElementById("cfg-titulo").value.trim() || "MF MÁQUINAS",
+      subtitulo: document.getElementById("cfg-subtitulo").value.trim(),
+      whatsapp: document.getElementById("cfg-whatsapp").value.trim(),
+      mostrarPreco: document.getElementById("cfg-mostrar-preco").value === "true",
+      senhaAdmin: document.getElementById("cfg-senha").value.trim() || "mf1234",
+      firebaseDatabaseURL: fbUrl
+    });
+
+    await salvarDeltaEToast("✅ Configurações do topo e WhatsApp atualizadas!");
+  }
+
+  async function uploadNovaLogo(input) {
+    if (!input.files || !input.files[0]) return;
+    const dataUrl = await CatalogoStorage.comprimirImagem(input.files[0], 500, 0.85);
+    estadoAtual.rawDelta.config = Object.assign({}, estadoAtual.rawDelta.config, {
+      logoUrl: dataUrl
+    });
+    await salvarDeltaEToast("🖼️ Nova logo enviada com sucesso!");
+  }
+
+  async function criarNovoProduto() {
+    const desc = document.getElementById("novo-desc").value.trim();
+    if (!desc) {
+      alert("Informe a descrição/nome do produto!");
+      return;
+    }
+
+    const ref = document.getElementById("novo-ref").value.trim() || "S/REF";
+    const cat = document.getElementById("novo-cat").value;
+    const uni = document.getElementById("novo-uni").value.trim() || "PC";
+    const preco = document.getElementById("novo-preco").value.trim();
+    const fileInput = document.getElementById("novo-foto-file");
+
+    let imgData = "";
+    if (fileInput.files && fileInput.files[0]) {
+      imgData = await CatalogoStorage.comprimirImagem(fileInput.files[0], 700, 0.82);
+    }
+
+    const novoProd = {
+      id: "custom_" + Date.now(),
+      ref,
+      desc,
+      marca: "",
+      uni,
+      cat,
+      preco,
+      img: imgData
+    };
+
+    if (!estadoAtual.rawDelta.customProducts) {
+      estadoAtual.rawDelta.customProducts = [];
+    }
+    estadoAtual.rawDelta.customProducts.unshift(novoProd);
+
+    // Limpa campos
+    document.getElementById("novo-desc").value = "";
+    document.getElementById("novo-ref").value = "";
+    document.getElementById("novo-preco").value = "";
+    fileInput.value = "";
+
+    await salvarDeltaEToast("➕ Novo produto adicionado ao catálogo!");
+    filtrarAdmin();
+  }
+
+  // Edição direta de qualquer campo do produto em tempo real
+  async function atualizarCampoProduto(id, campo, valor) {
+    if (!estadoAtual.rawDelta.overrides) {
+      estadoAtual.rawDelta.overrides = {};
+    }
+    if (!estadoAtual.rawDelta.overrides[id]) {
+      estadoAtual.rawDelta.overrides[id] = {};
+    }
+    estadoAtual.rawDelta.overrides[id][campo] = valor;
+
+    await salvarDeltaEToast("✏️ Produto atualizado em tempo real!");
+  }
+
+  // Clique para enviar/trocar foto de um produto
+  function selecionarFotoParaProduto(id) {
+    produtoAlvoFotoId = id;
+    const input = document.getElementById("global-photo-input");
+    input.value = "";
+    input.click();
+  }
+
+  document.getElementById("global-photo-input").addEventListener("change", async function() {
+    if (!this.files || !this.files[0] || !produtoAlvoFotoId) return;
+    const id = produtoAlvoFotoId;
+    mostrarToast("⏳ Comprimindo e enviando foto...");
+    try {
+      const base64Img = await CatalogoStorage.comprimirImagem(this.files[0], 700, 0.82);
+      await atualizarCampoProduto(id, "img", base64Img);
+      filtrarAdmin();
+    } catch (e) {
+      alert("Erro ao processar a imagem: " + e.message);
+    }
+  });
+
+  async function colarUrlFoto(id) {
+    const prod = estadoAtual.produtos.find(p => p.id === id);
+    const atual = (prod && prod.img && !prod.img.startsWith("data:")) ? prod.img : "";
+    const url = prompt("Cole o link (URL) da imagem do produto:", atual);
+    if (url !== null) {
+      await atualizarCampoProduto(id, "img", url.trim());
+      filtrarAdmin();
+    }
+  }
+
+  async function removerFotoProduto(id) {
+    if (!confirm("Remover a foto deste produto?")) return;
+    await atualizarCampoProduto(id, "img", "");
+    filtrarAdmin();
+  }
+
+  async function excluirProduto(id, desc) {
+    if (!confirm(`Deseja realmente excluir o produto:\n"${desc}"?`)) return;
+    if (!estadoAtual.rawDelta.deletedIds) {
+      estadoAtual.rawDelta.deletedIds = [];
+    }
+    if (!estadoAtual.rawDelta.deletedIds.includes(id)) {
+      estadoAtual.rawDelta.deletedIds.push(id);
+    }
+    await salvarDeltaEToast("🗑️ Produto removido do catálogo!");
+    filtrarAdmin();
+  }
+
+  let debounceAdmin;
+  function filtrarAdmin() {
+    clearTimeout(debounceAdmin);
+    debounceAdmin = setTimeout(() => {
+      const termo = document.getElementById("busca-admin").value.toLowerCase().trim();
+      const cat = document.getElementById("filtro-cat-admin").value;
+      const filtroFoto = document.getElementById("filtro-foto-admin").value;
+      const overrides = estadoAtual.rawDelta.overrides || {};
+
+      filtradosAdmin = estadoAtual.produtos.filter(p => {
+        if (cat !== "TODAS" && p.cat !== cat) return false;
+
+        const temFoto = p.img && p.img.trim() !== "";
+        if (filtroFoto === "COM_FOTO" && !temFoto) return false;
+        if (filtroFoto === "SEM_FOTO" && temFoto) return false;
+        if (filtroFoto === "EDITADOS" && !overrides[p.id] && !p.isCustom) return false;
+
+        if (termo) {
+          const termos = termo.split(" ").filter(Boolean);
+          const alvo = `${p.desc} ${p.ref} ${p.cat}`.toLowerCase();
+          return termos.every(t => alvo.includes(t));
+        }
+        return true;
+      });
+
+      renderizarGridAdmin();
+    }, 100);
+  }
+
+  function renderizarGridAdmin() {
+    const grid = document.getElementById("grid-admin");
+    const btnMais = document.getElementById("btn-mais-admin");
+    const overrides = estadoAtual.rawDelta.overrides || {};
+
+    if (filtradosAdmin.length === 0) {
+      grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">Nenhum produto encontrado com esses filtros.</p>`;
+      btnMais.style.display = "none";
+      return;
+    }
+
+    const visiveis = filtradosAdmin.slice(0, limiteAdmin);
+
+    grid.innerHTML = visiveis.map(p => {
+      const idSafe = p.id.replace(/'/g, "\\'");
+      const descSafe = (p.desc || "").replace(/"/g, "&quot;");
+      const refSafe = (p.ref || "").replace(/"/g, "&quot;");
+      const uniSafe = (p.uni || "PC").replace(/"/g, "&quot;");
+      const precoSafe = (p.preco || "").replace(/"/g, "&quot;");
+      const temFoto = p.img && p.img.trim() !== "";
+      const foiEditado = Boolean(overrides[p.id] || p.isCustom);
+
+      const opcoesCat = LISTA_CATEGORIAS.map(c =>
+        `<option value="${c}" ${p.cat === c ? "selected" : ""}>${c}</option>`
+      ).join("");
+
+      return `
+        <div class="prod-editor-card ${foiEditado ? 'modificado' : ''}">
+          <div class="prod-top">
+            <div>
+              <div class="photo-box" onclick="selecionarFotoParaProduto('${idSafe}')" title="Clique para enviar foto do computador ou celular">
+                ${temFoto
+                  ? `<img src="${p.img}" alt="Foto">`
+                  : `<div class="upload-hint">📷<br>Enviar<br>Foto</div>`
+                }
+              </div>
+              <div class="photo-actions">
+                <button class="btn-mini" onclick="selecionarFotoParaProduto('${idSafe}')" title="Upload de arquivo">📁</button>
+                <button class="btn-mini" onclick="colarUrlFoto('${idSafe}')" title="Colar link de imagem">🔗</button>
+                ${temFoto ? `<button class="btn-mini danger" onclick="removerFotoProduto('${idSafe}')" title="Remover foto">✕</button>` : ""}
+              </div>
+            </div>
+
+            <div class="prod-fields">
+              <input type="text" value="${descSafe}" placeholder="Descrição do produto"
+                onchange="atualizarCampoProduto('${idSafe}', 'desc', this.value)" title="Descrição do Produto">
+
+              <div class="row-3">
+                <input type="text" value="${refSafe}" placeholder="Referência"
+                  onchange="atualizarCampoProduto('${idSafe}', 'ref', this.value)" title="Código / Referência">
+                <input type="text" value="${uniSafe}" placeholder="Unid."
+                  onchange="atualizarCampoProduto('${idSafe}', 'uni', this.value)" title="Unidade (PC, UNI, KG)">
+                <input type="text" value="${precoSafe}" placeholder="R$ Preço"
+                  onchange="atualizarCampoProduto('${idSafe}', 'preco', this.value)" title="Preço (opcional)">
+              </div>
+
+              <select onchange="atualizarCampoProduto('${idSafe}', 'cat', this.value)" title="Categoria">
+                ${opcoesCat}
+              </select>
+            </div>
+          </div>
+
+          <div class="card-bottom-actions">
+            <span style="color: ${foiEditado ? '#2563eb' : '#94a3b8'}; font-weight: 600;">
+              ${foiEditado ? "● Editado / Sincronizado" : "● Original da base"}
+            </span>
+            <button class="btn-mini danger" onclick="excluirProduto('${idSafe}', '${descSafe.replace(/'/g, "\\'")}')">🗑️ Excluir</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if (limiteAdmin < filtradosAdmin.length) {
+      btnMais.style.display = "inline-flex";
+      btnMais.innerText = `➕ Mostrar mais produtos (${filtradosAdmin.length - limiteAdmin} restantes)`;
+    } else {
+      btnMais.style.display = "none";
+    }
+  }
+
+  function carregarMaisAdmin() {
+    limiteAdmin += 40;
+    renderizarGridAdmin();
+  }
+
+  // Gera e baixa o arquivo produtos.js completo e atualizado (ideal caso queira commitar no GitHub/Netlify)
+  function baixarProdutosJs() {
+    const listaExportacao = estadoAtual.produtos.map(p => ({
+      id: p.id,
+      ref: p.ref,
+      desc: p.desc,
+      marca: p.marca || "",
+      uni: p.uni,
+      cat: p.cat,
+      preco: p.preco || "",
+      img: p.img || ""
+    }));
+
+    const conteudo = "const produtos = " + JSON.stringify(listaExportacao, null, 2) + ";\n";
+    const blob = new Blob([conteudo], { type: "application/javascript;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "produtos.js";
+    a.click();
+    URL.revokeObjectURL(url);
+    mostrarToast("💾 Arquivo produtos.js gerado para download!");
+  }
+
+  function exportarBackupJson() {
+    const blob = new Blob([JSON.stringify(estadoAtual.rawDelta, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup_catalogo_mf.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importarBackupJson(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        estadoAtual.rawDelta = data;
+        await salvarDeltaEToast("📥 Backup importado e aplicado em tempo real!");
+        preencherCamposConfig();
+        filtrarAdmin();
+      } catch (err) {
+        alert("Arquivo de backup inválido!");
+      }
+    };
+    reader.readAsText(input.files[0]);
+  }
+
+  // Inicialização do Admin
+  (async function initAdmin() {
+    popularSelectsCategorias();
+    estadoAtual = await CatalogoStorage.carregarEstado();
+
+    if (sessionStorage.getItem("mf_admin_logged") === "1") {
+      document.getElementById("login-screen").style.display = "none";
+    }
+
+    preencherCamposConfig();
+    atualizarEstatisticas();
+    filtrarAdmin();
+
+    CatalogoStorage.onUpdate((novoEstado) => {
+      estadoAtual = novoEstado;
+      atualizarEstatisticas();
+      filtrarAdmin();
+    });
+    CatalogoStorage.iniciarEscutaTempoReal();
+  })();
+</script>
+
+</body>
+</html>
