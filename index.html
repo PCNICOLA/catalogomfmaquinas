@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MF MÁQUINAS - Catálogo de Pedidos</title>
+  
+  <style>
+    :root {
+      --primary: #d32f2f;
+      --primary-dark: #b71c1c;
+      --whatsapp: #25d366;
+      --whatsapp-dark: #1ebc57;
+      --bg: #f5f6f8;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      padding-bottom: 90px;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px 16px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      max-height: 110px;
+      max-width: 240px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    header h1 {
+      color: var(--primary);
+      font-size: 24px;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .stats-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      background: #fef2f2;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid #fee2e2;
+    }
+
+    /* Barra de Busca e Categorias */
+    .search-section {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      margin-bottom: 20px;
+      background: rgba(245, 246, 248, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 6px 0;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 15px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      background: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+    }
+
+    .categorias-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 2px 6px 2px;
+      scrollbar-width: thin;
+    }
+
+    .categorias-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .categorias-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .btn-cat {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 0.15s;
+    }
+
+    .btn-cat:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-cat.ativo {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(211, 47, 47, 0.3);
+    }
+
+    /* Grid de Produtos */
+    .grid-produtos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s, box-shadow 0.15s;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      height: 175px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid #f1f5f9;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px;
+      transition: transform 0.25s ease;
+    }
+
+    .card-img-wrapper:hover img {
+      transform: scale(1.05);
+    }
+
+    .card-img-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 12px;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .card-img-placeholder span.icon {
+      font-size: 28px;
+      opacity: 0.6;
+    }
+
+    .card-header {
+      margin-bottom: 12px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #fef2f2;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    .tag-cat {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #111827;
+    }
+
+    .card-price {
+      margin-top: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #16a34a;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-add {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s;
+    }
+
+    .btn-add:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-carregar-mais {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      margin: 10px auto 30px auto;
+      padding: 12px 20px;
+      background: #ffffff;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-carregar-mais:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Modal de Zoom da Foto */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lightbox-overlay.aberto {
+      display: flex;
+    }
+
+    .lightbox-content {
+      background: #fff;
+      border-radius: 14px;
+      max-width: 600px;
+      width: 100%;
+      padding: 18px;
+      text-align: center;
+      position: relative;
+    }
+
+    .lightbox-content img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: #f1f5f9;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Bloco do Pedido */
+    .pedido-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-top: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .pedido-card h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .lista-pedido {
+      list-style: none;
+      margin-bottom: 20px;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .item-pedido {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 14px;
+      gap: 10px;
+    }
+
+    .item-pedido-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item-pedido-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+      object-fit: contain;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .qtd-controles {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qtd-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.15s;
+    }
+
+    .qtd-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .admin-link-top span.txt {
+        display: none;
+      }
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .btn-whatsapp {
+      background: var(--whatsapp);
+      color: white;
+      border: none;
+      padding: 18px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-whatsapp:hover {
+      background: var(--whatsapp-dark);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <img src="logo.jpg" id="site-logo" alt="MF Máquinas Logo" class="logo" onerror="this.style.display='none'">
+    <div>
+      <h1 id="site-titulo">MF MÁQUINAS</h1>
+      <p id="site-subtitulo">Catálogo de Peças e Pedido Direto via WhatsApp</p>
+      <div style="margin-top: 8px;">
+        <span class="stats-badge" id="badge-total">Carregando catálogo...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Seção de Busca e Categorias -->
+  <div class="search-section">
+    <div class="search-box">
+      <input type="text" id="filtro" placeholder="🔍 Digite para buscar qualquer produto ou código de referência..." oninput="filtrarProdutos()">
+    </div>
+    <div class="categorias-container" id="container-categorias"></div>
+  </div>
+
+  <!-- Catálogo -->
+  <div class="grid-produtos" id="catalogo"></div>
+  <button id="btn-mais" class="btn-carregar-mais" onclick="carregarMais()" style="display: none;">
+    ➕ Carregar mais produtos...
+  </button>
+
+  <!-- Formulário e Resumo do Pedido -->
+  <div class="pedido-card">
+    <h2>📋 Itens Solicitados (<span id="total-itens">0</span>)</h2>
+    <ul class="lista-pedido" id="lista-pedido">
+      <li style="color: var(--text-muted); font-size: 14px;">Nenhum item selecionado.</li>
+    </ul>
+
+    <h2>👤 Seus Dados</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome / Razão Social *</label>
+        <input type="text" id="cliente" placeholder="Ex: João da Silva / Oficina São José">
+      </div>
+      <div class="form-group">
+        <label>Cidade / Bairro ou Retirada</label>
+        <input type="text" id="local" placeholder="Ex: Retirada no balcão / Entrega Centro">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom: 16px;">
+      <label>Observações / Aplicação (Opcional)</label>
+      <textarea id="obs" rows="2" placeholder="Ex: Informar urgência, voltagem específica ou modelo da máquina"></textarea>
+    </div>
+
+    <!-- Botão Principal: Enviar via WhatsApp -->
+    <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+      📲 Enviar Pedido via WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- Modal Lightbox para ampliar foto -->
+<div class="lightbox-overlay" id="lightbox" onclick="fecharLightbox(event)">
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('aberto')">✕</button>
+    <img id="lightbox-img" src="" alt="Foto ampliada">
+    <p id="lightbox-caption" style="margin-top: 10px; font-weight: 600; font-size: 14px;"></p>
+  </div>
+</div>
+
+<!-- Base de dados completa de produtos e Sincronização -->
+<script src="produtos.js"></script>
+<script src="sync-storage.js"></script>
+
+<script>
+  let telefoneWhatsapp = "5537988091454";
+  let mostrarPrecoConfig = true;
+  let catalogoAtivo = [];
+  let pedido = [];
+  let listaFiltrada = [];
+  let categoriaAtiva = "TODAS";
+  let limiteExibicao = 60;
+  const ITENS_POR_PAGINA = 60;
+
+  // Lista de Categorias
+  const ICONES_CATEGORIAS = {
+    "TODAS": "📂 Todas as Peças",
+    "COM_FOTO": "📷 Com Foto",
+    "Bombas e Motores": "⚙️ Bombas e Motores",
+    "Rotores e Peças Internas": "🔄 Rotores e Peças",
+    "Rolamentos e Retentores": "🔘 Rolamentos e Retentores",
+    "Correias e Polias": "⭕ Correias e Polias",
+    "Capacitores": "⚡ Capacitores",
+    "Elétrica e Automação": "🔌 Elétrica e Comandos",
+    "Selos e Vedações": "🛡️ Selos e Vedações",
+    "Cabos, Fios e Terminais": "🧵 Cabos e Fios",
+    "Carcaças, Tampas e Ventoinhas": "💨 Ventoinhas e Tampas",
+    "Peças de Motores e Bombas": "🔋 Peças de Motores",
+    "Ferramentas, Químicos e Fixação": "🛠️ Ferramentas e Fixação",
+    "Diversos e Acessórios": "📦 Diversos"
+  };
+
+  function aplicarEstadoCatalogo(state) {
+    catalogoAtivo = state.produtos || [];
+    const cfg = state.config || {};
+
+    if (cfg.titulo) document.getElementById("site-titulo").innerText = cfg.titulo;
+    if (cfg.subtitulo) document.getElementById("site-subtitulo").innerText = cfg.subtitulo;
+    if (cfg.whatsapp) telefoneWhatsapp = cfg.whatsapp.replace(/\D/g, "");
+    if (cfg.logoUrl) {
+      const logoEl = document.getElementById("site-logo");
+      logoEl.src = cfg.logoUrl;
+      logoEl.style.display = "";
+    }
+    mostrarPrecoConfig = cfg.mostrarPreco !== false;
+
+    document.getElementById("badge-total").innerText = `📦 ${catalogoAtivo.length.toLocaleString('pt-BR')} produtos disponíveis`;
+
+    inicializarCategorias();
+    executarFiltro();
+  }
+
+  function inicializarCategorias() {
+    const container = document.getElementById("container-categorias");
+    if (!container) return;
+
+    const contagem = {
+      "TODAS": catalogoAtivo.length,
+      "COM_FOTO": catalogoAtivo.filter(p => p.img && p.img.trim() !== "").length
+    };
+
+    catalogoAtivo.forEach(p => {
+      const c = p.cat || "Diversos e Acessórios";
+      contagem[c] = (contagem[c] || 0) + 1;
+    });
+
+    const todasCategorias = ["TODAS"];
+    if (contagem["COM_FOTO"] > 0) todasCategorias.push("COM_FOTO");
+    Object.keys(ICONES_CATEGORIAS).forEach(c => {
+      if (c !== "TODAS" && c !== "COM_FOTO") todasCategorias.push(c);
+    });
+
+    container.innerHTML = todasCategorias.map(cat => {
+      const label = ICONES_CATEGORIAS[cat] || cat;
+      const count = contagem[cat] || 0;
+      const classeAtiva = cat === categoriaAtiva ? "ativo" : "";
+      return `<button class="btn-cat ${classeAtiva}" onclick="selecionarCategoria('${cat}', event)">${label} (${count})</button>`;
+    }).join("");
+  }
+
+  function selecionarCategoria(cat, ev) {
+    categoriaAtiva = cat;
+    document.querySelectorAll(".btn-cat").forEach(btn => btn.classList.remove("ativo"));
+    if (ev && ev.target) ev.target.classList.add("ativo");
+    limiteExibicao = ITENS_POR_PAGINA;
+    executarFiltro();
+  }
+
+  function abrirLightbox(imgSrc, desc) {
+    if (!imgSrc) return;
+    document.getElementById("lightbox-img").src = imgSrc;
+    document.getElementById("lightbox-caption").innerText = desc || "";
+    document.getElementById("lightbox").classList.add("aberto");
+  }
+
+  function fecharLightbox(e) {
+    if (e.target.id === "lightbox") {
+      document.getElementById("lightbox").classList.remove("aberto");
+    }
+  }
+
+  function renderizarCatalogo() {
+    const catalogo = document.getElementById("catalogo");
+    const btnMais = document.getElementById("btn-mais");
+    
+    if (listaFiltrada.length === 0) {
+      catalogo.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;">Nenhum produto encontrado nesta categoria ou pesquisa.</p>`;
+      btnMais.style.display = "none";
+      return;
+    }
+
+    const itensParaExibir = listaFiltrada.slice(0, limiteExibicao);
+
+    catalogo.innerHTML = itensParaExibir.map((prod) => {
+      const idSafe = (prod.id || "").replace(/'/g, "\\'");
+      const temFoto = prod.img && prod.img.trim() !== "";
+      const temPreco = mostrarPrecoConfig && prod.preco && String(prod.preco).trim() !== "";
+
+      const blocoFoto = temFoto
+        ? `<div class="card-img-wrapper" onclick="abrirLightbox('${prod.img.replace(/'/g, "\\'")}', '${(prod.desc || "").replace(/'/g, "\\'")}')">
+             <img src="${prod.img}" alt="${(prod.desc || "").replace(/"/g, "&quot;")}" loading="lazy">
+           </div>`
+        : `<div class="card-img-wrapper" style="cursor: default;">
+             <div class="card-img-placeholder">
+               <span class="icon">🔧</span>
+               <span>MF Máquinas</span>
+             </div>
+           </div>`;
+
+      const blocoPreco = temPreco
+        ? `<div class="card-price">R$ ${prod.preco}</div>`
+        : "";
+
+      return `
+        <div class="card">
+          <div>
+            ${blocoFoto}
+            <div class="card-header">
+              <div class="card-tags">
+                <span class="tag tag-cat">${prod.cat || 'Peça'}</span>
+                <span class="tag" style="background:#f1f5f9; color:#475569;">REF: ${prod.ref || 'S/REF'}</span>
+                <span class="tag" style="background:#f8fafc; color:#64748b;">${prod.uni || 'PC'}</span>
+              </div>
+              <div class="card-title">${prod.desc}</div>
+              ${blocoPreco}
+            </div>
+          </div>
+          <div class="card-footer">
+            <button class="btn-add" onclick="adicionarAoPedidoPorId('${idSafe}')">+ Adicionar ao Pedido</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if (limiteExibicao < listaFiltrada.length) {
+      btnMais.style.display = "block";
+      btnMais.innerText = `➕ Carregar mais (${listaFiltrada.length - limiteExibicao} restantes)`;
+    } else {
+      btnMais.style.display = "none";
+    }
+  }
+
+  function carregarMais() {
+    limiteExibicao += ITENS_POR_PAGINA;
+    renderizarCatalogo();
+  }
+
+  let debounceTimer;
+  function filtrarProdutos() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      limiteExibicao = ITENS_POR_PAGINA;
+      executarFiltro();
+    }, 120);
+  }
+
+  function executarFiltro() {
+    const inputFiltro = document.getElementById("filtro");
+    const termo = inputFiltro ? inputFiltro.value.toLowerCase().trim() : "";
+
+    listaFiltrada = catalogoAtivo.filter(p => {
+      if (categoriaAtiva === "COM_FOTO") {
+        if (!p.img || p.img.trim() === "") return false;
+      } else if (categoriaAtiva !== "TODAS" && p.cat !== categoriaAtiva) {
+        return false;
+      }
+      if (termo) {
+        const termos = termo.split(' ').filter(t => t.length > 0);
+        const texto = `${p.desc} ${p.ref} ${p.cat}`.toLowerCase();
+        return termos.every(t => texto.includes(t));
+      }
+      return true;
+    });
+
+    // Ordena itens com foto ou destaque primeiro quando na aba TODAS e sem pesquisa
+    if (!termo && categoriaAtiva === "TODAS") {
+      listaFiltrada.sort((a, b) => {
+        const aFoto = (a.img && a.img.trim() !== "") ? 1 : 0;
+        const bFoto = (b.img && b.img.trim() !== "") ? 1 : 0;
+        if (bFoto !== aFoto) return bFoto - aFoto;
+        return 0;
+      });
+    }
+
+    renderizarCatalogo();
+  }
+
+  function adicionarAoPedidoPorId(id) {
+    const prod = catalogoAtivo.find(p => p.id === id);
+    if (!prod) return;
+
+    const item = pedido.find(p => p.id === id || (p.desc === prod.desc && p.ref === prod.ref));
+    if (item) {
+      item.qtd += 1;
+    } else {
+      pedido.push({
+        id: prod.id,
+        ref: prod.ref || "S/REF",
+        desc: prod.desc || "",
+        uni: prod.uni || "PC",
+        preco: prod.preco || "",
+        img: prod.img || "",
+        qtd: 1
+      });
+    }
+    atualizarResumo();
+  }
+
+  function alterarQtd(index, delta) {
+    if (pedido[index]) {
+      pedido[index].qtd += delta;
+      if (pedido[index].qtd <= 0) {
+        pedido.splice(index, 1);
+      }
+      atualizarResumo();
+    }
+  }
+
+  function atualizarResumo() {
+    const lista = document.getElementById("lista-pedido");
+    const totalContador = document.getElementById("total-itens");
+
+    const totalQtd = pedido.reduce((acc, curr) => acc + curr.qtd, 0);
+    totalContador.innerText = totalQtd;
+
+    if (pedido.length === 0) {
+      lista.innerHTML = `<li style="color: var(--text-muted); font-size: 14px;">Nenhum item selecionado.</li>`;
+      return;
+    }
+
+    lista.innerHTML = pedido.map((item, index) => `
+      <li class="item-pedido">
+        <div class="item-pedido-info">
+          ${item.img ? `<img src="${item.img}" class="item-pedido-thumb" alt="Foto">` : ""}
+          <div>
+            <strong>${item.desc}</strong><br>
+            <small style="color: var(--text-muted);">Ref: ${item.ref}${mostrarPrecoConfig && item.preco ? ` • R$ ${item.preco}` : ''}</small>
+          </div>
+        </div>
+        <div class="qtd-controles">
+          <button class="qtd-btn" onclick="alterarQtd(${index}, -1)">-</button>
+          <span><strong>${item.qtd}</strong> ${item.uni}</span>
+          <button class="qtd-btn" onclick="alterarQtd(${index}, 1)">+</button>
+        </div>
+      </li>
+    `).join("");
+  }
+
+  function enviarWhatsApp() {
+    if (pedido.length === 0) {
+      alert("Por favor, adicione pelo menos um item à sua lista antes de enviar!");
+      return;
+    }
+
+    const cliente = document.getElementById("cliente").value.trim();
+    const local = document.getElementById("local").value.trim();
+    const obs = document.getElementById("obs").value.trim();
+
+    if (!cliente) {
+      alert("Por favor, preencha o seu nome ou empresa.");
+      document.getElementById("cliente").focus();
+      return;
+    }
+
+    const nomeLoja = document.getElementById("site-titulo").innerText || "MF MÁQUINAS";
+    let msg = `*NOVO PEDIDO / COTAÇÃO - ${nomeLoja}*\n`;
+    msg += `------------------------------------\n`;
+    msg += `*Cliente:* ${cliente}\n`;
+    if (local) msg += `*Local/Entrega:* ${local}\n`;
+    if (obs) msg += `*Observações:* ${obs}\n`;
+    msg += `------------------------------------\n`;
+    msg += `*ITENS SOLICITADOS:*\n\n`;
+
+    pedido.forEach((item, index) => {
+      msg += `${index + 1}. *${item.desc}*\n`;
+      const precoTxt = (mostrarPrecoConfig && item.preco) ? ` | Preço: R$ ${item.preco}` : "";
+      msg += `   └ Ref: ${item.ref} | Qtd: *${item.qtd} (${item.uni})*${precoTxt}\n`;
+    });
+
+    msg += `\n------------------------------------\n`;
+    msg += `Olá! Gostaria de confirmar a disponibilidade e o prazo dos itens acima.`;
+
+    const url = `https://wa.me/${telefoneWhatsapp}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+  }
+
+  // Inicialização com suporte a Tempo Real
+  (async function init() {
+    const estadoInicial = await CatalogoStorage.carregarEstado();
+    aplicarEstadoCatalogo(estadoInicial);
+
+    CatalogoStorage.onUpdate((novoEstado) => {
+      aplicarEstadoCatalogo(novoEstado);
+    });
+    CatalogoStorage.iniciarEscutaTempoReal();
+  })();
+</script>
+
+</body>
+</html>
